@@ -1,0 +1,571 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:today_my_school_final/models/model_auth.dart';
+import 'package:today_my_school_final/models/model_editor.dart';
+import 'package:today_my_school_final/models/model_user.dart';
+import 'package:today_my_school_final/style.dart';
+import 'package:provider/provider.dart';
+import 'package:today_my_school_final/widgets/message.dart';
+
+class ProfileEditorPage extends StatefulWidget {
+  const ProfileEditorPage({super.key});
+
+  @override
+  State<ProfileEditorPage> createState() => _ProfileEditorPageState();
+}
+
+class _ProfileEditorPageState extends State<ProfileEditorPage> {
+  static final GlobalKey<FormState> _formKey = GlobalKey();
+  static String email = '';
+  static String name = '';
+  static String phone = '';
+
+  Future _getUser() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get()
+        .then(
+      (snapshot) async {
+        if (snapshot.exists) {
+          setState(() {
+            email = snapshot.data()!['email'];
+            name = snapshot.data()!['name'];
+            phone = snapshot.data()!['phone'];
+            snapshot.data()!['uid'];
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getUser();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = Provider.of<AuthModel>(context, listen: false);
+
+    return ChangeNotifierProvider(
+      create: (_) => EditorFieldModel(),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: ColorPalette.white,
+          foregroundColor: ColorPalette.blue,
+          title: const Text('내 정보 수정'),
+          actions: [
+            IconButton(
+              onPressed: () async {
+                await auth.logout();
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    const SnackBar(content: Text('로그아웃 완료!')),
+                  );
+                Navigator.of(context).pushReplacementNamed('/login');
+              },
+              icon: const Icon(
+                Icons.logout_rounded,
+                size: 24,
+              ),
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Center(
+              child: GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                },
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 8.h),
+                              const InputGuide(),
+                              const Divider(),
+                              const EmailInput(),
+                              const Divider(),
+                              const PasswordInput(),
+                              const Divider(),
+                              const PasswordConfirmInput(),
+                              const Divider(),
+                              const NameInput(),
+                              const Divider(),
+                              const PhoneInput(),
+                              const Divider(),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const EditButton(),
+                      SizedBox(height: 40.h),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        resizeToAvoidBottomInset: false,
+      ),
+    );
+  }
+}
+
+class InputGuide extends StatelessWidget {
+  const InputGuide({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        text: '* ',
+        style: TextStyleSet.semibold15.copyWith(color: ColorPalette.red),
+        children: <TextSpan>[
+          TextSpan(text: '수정할 정보를 입력해주세요', style: TextStyleSet.medium15),
+        ],
+      ),
+    );
+  }
+}
+
+class EmailInput extends StatelessWidget {
+  const EmailInput({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final editorField = Provider.of<EditorFieldModel>(context, listen: false);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(bottom: 22.h),
+          child: Text(
+            '아이디(학교 웹메일)',
+            style: TextStyleSet.light13,
+          ),
+        ),
+        SizedBox(
+          width: 192.w,
+          height: 64.h,
+          child: TextFormField(
+            initialValue: _ProfileEditorPageState.email,
+            keyboardType: TextInputType.emailAddress,
+            onChanged: (email) {
+              editorField.setEmail(email);
+            },
+            validator: (email) {
+              if (email!.trim().isEmpty || !email.contains('kmou.ac.kr')) {
+                return '학교 웹메일을 입력하세요';
+              }
+              return null;
+            },
+            style: TextStyleSet.regular15,
+            decoration: InputDecoration(
+              helperText: '',
+              errorStyle:
+                  TextStyleSet.light11.copyWith(color: ColorPalette.red),
+              isDense: true,
+              contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              enabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.grey,
+                  width: 1,
+                ),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.blue,
+                  width: 2,
+                ),
+              ),
+              errorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.red,
+                  width: 1,
+                ),
+              ),
+              focusedErrorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.red,
+                  width: 2,
+                ),
+              ),
+            ),
+            cursorColor: ColorPalette.black,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PasswordInput extends StatelessWidget {
+  const PasswordInput({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final editorField = Provider.of<EditorFieldModel>(context, listen: false);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(bottom: 22.h),
+          child: Text(
+            '비밀번호(6자리 이상)',
+            style: TextStyleSet.light13,
+          ),
+        ),
+        SizedBox(
+          width: 192.w,
+          height: 64.h,
+          child: TextFormField(
+            onChanged: (password) {
+              editorField.setPassword(password);
+            },
+            validator: (password) {
+              if (password!.trim().isEmpty || password.length < 6) {
+                return '6자리 이상의 비밀번호를 입력하세요';
+              }
+              return null;
+            },
+            style: TextStyleSet.regular15,
+            obscureText: true,
+            decoration: InputDecoration(
+              helperText: '',
+              errorStyle:
+                  TextStyleSet.light11.copyWith(color: ColorPalette.red),
+              isDense: true,
+              contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              disabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.grey,
+                  width: 1,
+                ),
+              ),
+              enabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.grey,
+                  width: 1,
+                ),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.blue,
+                  width: 2,
+                ),
+              ),
+              errorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.red,
+                  width: 1,
+                ),
+              ),
+              focusedErrorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.red,
+                  width: 2,
+                ),
+              ),
+            ),
+            enabled: false,
+            cursorColor: ColorPalette.black,
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class PasswordConfirmInput extends StatelessWidget {
+  const PasswordConfirmInput({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final editorField = Provider.of<EditorFieldModel>(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(bottom: 22.h),
+          child: Text(
+            '비밀번호 확인',
+            style: TextStyleSet.light13,
+          ),
+        ),
+        SizedBox(
+          width: 192.w,
+          height: 64.h,
+          child: TextFormField(
+            onChanged: (passwordConfirm) {
+              editorField.setPasswordConfirm(passwordConfirm);
+            },
+            style: TextStyleSet.regular15,
+            obscureText: true,
+            decoration: InputDecoration(
+              helperText: '',
+              errorText: editorField.password != editorField.passwordConfirm
+                  ? '비밀번호가 일치하지 않아요'
+                  : null,
+              errorStyle:
+                  TextStyleSet.light11.copyWith(color: ColorPalette.red),
+              isDense: true,
+              contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              disabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.grey,
+                  width: 1,
+                ),
+              ),
+              enabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.grey,
+                  width: 1,
+                ),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.blue,
+                  width: 2,
+                ),
+              ),
+              errorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.red,
+                  width: 1,
+                ),
+              ),
+              focusedErrorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.red,
+                  width: 2,
+                ),
+              ),
+            ),
+            enabled: false,
+            cursorColor: ColorPalette.black,
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class NameInput extends StatelessWidget {
+  const NameInput({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final editorField = Provider.of<EditorFieldModel>(context, listen: false);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(bottom: 22.h),
+          child: Text(
+            '이름',
+            style: TextStyleSet.light13,
+          ),
+        ),
+        SizedBox(
+          width: 192.w,
+          height: 64.h,
+          child: TextFormField(
+            initialValue: _ProfileEditorPageState.name,
+            onChanged: (name) {
+              editorField.setName(name);
+            },
+            validator: (name) {
+              if (name!.trim().isEmpty) {
+                return '이름을 입력하세요';
+              }
+              return null;
+            },
+            style: TextStyleSet.regular15,
+            decoration: InputDecoration(
+              helperText: '',
+              errorStyle:
+                  TextStyleSet.light11.copyWith(color: ColorPalette.red),
+              isDense: true,
+              contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              enabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.grey,
+                  width: 1,
+                ),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.blue,
+                  width: 2,
+                ),
+              ),
+              errorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.red,
+                  width: 1,
+                ),
+              ),
+              focusedErrorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.red,
+                  width: 2,
+                ),
+              ),
+            ),
+            cursorColor: ColorPalette.black,
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class PhoneInput extends StatelessWidget {
+  const PhoneInput({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final editorField = Provider.of<EditorFieldModel>(context, listen: false);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(bottom: 22.h),
+          child: Text(
+            '연락처',
+            style: TextStyleSet.light13,
+          ),
+        ),
+        SizedBox(
+          width: 192.w,
+          height: 64.h,
+          child: TextFormField(
+            initialValue: _ProfileEditorPageState.phone,
+            keyboardType: TextInputType.phone,
+            onChanged: (phone) {
+              editorField.setPhone(phone);
+            },
+            validator: (phone) {
+              if (phone!.trim().isEmpty || phone.length < 10) {
+                return '전화번호를 입력하세요';
+              }
+              return null;
+            },
+            style: TextStyleSet.regular15,
+            decoration: InputDecoration(
+              helperText: '',
+              errorStyle:
+                  TextStyleSet.light11.copyWith(color: ColorPalette.red),
+              isDense: true,
+              contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              enabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.grey,
+                  width: 1,
+                ),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.blue,
+                  width: 2,
+                ),
+              ),
+              errorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.red,
+                  width: 1,
+                ),
+              ),
+              focusedErrorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.red,
+                  width: 2,
+                ),
+              ),
+            ),
+            cursorColor: ColorPalette.black,
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class EditButton extends StatelessWidget {
+  const EditButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final user = Provider.of<UserModel>(context, listen: false);
+    final editorField = Provider.of<EditorFieldModel>(context, listen: false);
+    return SizedBox(
+      width: 128.w,
+      height: 40.h,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorPalette.blue,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        onPressed: () async {
+          if (_ProfileEditorPageState._formKey.currentState!.validate()) {
+            _ProfileEditorPageState._formKey.currentState!.save();
+            await user
+                .updateUser(
+                    editorField.email, editorField.name, editorField.phone)
+                .then(
+              (userStatus) {
+                if (userStatus == UserStatus.updateSuccess) {
+                  toast('수정 완료!');
+                } else {
+                  toast('수정 실패!');
+                }
+              },
+            );
+          }
+        },
+        child: Text(
+          '저장하기',
+          style: TextStyleSet.bold16.copyWith(color: ColorPalette.white),
+        ),
+      ),
+    );
+  }
+}
