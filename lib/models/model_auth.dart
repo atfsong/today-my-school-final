@@ -7,6 +7,8 @@ enum AuthStatus {
   signupFail,
   loginSuccess,
   loginFail,
+  resetSuccess,
+  resetFail,
 }
 
 class AuthModel with ChangeNotifier {
@@ -53,5 +55,15 @@ class AuthModel with ChangeNotifier {
     _user = null;
     await _auth.signOut();
     print("[-] 로그아웃");
+  }
+
+  Future resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return AuthStatus.resetSuccess;
+    } catch (e) {
+      print(e);
+      return AuthStatus.resetFail;
+    }
   }
 }
