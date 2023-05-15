@@ -38,7 +38,7 @@ class _SplashPageState extends State<SplashPage> {
     await checkLogin().then(
       (isLogin) {
         if (isLogin) {
-          Navigator.of(context).pushReplacementNamed('/reservation_result');
+          Navigator.of(context).pushReplacementNamed('/home');
         } else {
           Navigator.of(context).pushReplacementNamed('/login');
         }

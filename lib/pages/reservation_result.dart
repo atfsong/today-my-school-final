@@ -65,11 +65,11 @@ class _ReservationResultPageState extends State<ReservationResultPage> {
                       width: MediaQuery.of(context).size.width,
                       height: 154.h,
                       decoration: const BoxDecoration(
+                        color: ColorPalette.blue,
                         borderRadius: BorderRadius.vertical(
                           top: Radius.zero,
                           bottom: Radius.circular(50),
                         ),
-                        color: ColorPalette.blue,
                       ),
                     ),
                     Positioned(

@@ -7,7 +7,6 @@ import 'package:today_my_school_final/models/model_editor.dart';
 import 'package:today_my_school_final/models/model_user.dart';
 import 'package:today_my_school_final/style.dart';
 import 'package:provider/provider.dart';
-import 'package:today_my_school_final/widgets/message.dart';
 
 class ProfileEditorPage extends StatefulWidget {
   const ProfileEditorPage({super.key});
@@ -553,9 +552,17 @@ class EditButton extends StatelessWidget {
                 .then(
               (userStatus) {
                 if (userStatus == UserStatus.updateSuccess) {
-                  toast('수정 완료!');
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      const SnackBar(content: Text('수정 완료!')),
+                    );
                 } else {
-                  toast('수정 실패!');
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      const SnackBar(content: Text('수정에 실패했어요 다시 시도해주세요')),
+                    );
                 }
               },
             );

@@ -58,8 +58,6 @@ class MyApp extends StatelessWidget {
                 space: 16.h,
                 thickness: 1,
               ),
-              fontFamily: 'Roboto',
-              fontFamilyFallback: const ['NotoSansKR'],
             ),
             routes: {
               '/': (context) => const SplashPage(),
