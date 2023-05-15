@@ -9,6 +9,7 @@ import 'package:today_my_school_final/models/model_reservation.dart';
 import 'package:today_my_school_final/models/model_user.dart';
 import 'package:today_my_school_final/pages/home.dart';
 import 'package:today_my_school_final/pages/login.dart';
+import 'package:today_my_school_final/pages/password_reset.dart';
 import 'package:today_my_school_final/pages/profile_editor.dart';
 import 'package:today_my_school_final/pages/reservation_check.dart';
 import 'package:today_my_school_final/pages/reservation_form.dart';
@@ -64,6 +65,7 @@ class MyApp extends StatelessWidget {
               '/': (context) => const SplashPage(),
               '/login': (context) => const LoginPage(),
               '/signup': (context) => const SignupPage(),
+              '/password_reset': (context) => const PasswordResetPage(),
               '/home': (context) => const HomePage(),
               '/profile_editor': (context) => const ProfileEditorPage(),
               '/reservation_check': (context) => const ReservationCheckPage(),

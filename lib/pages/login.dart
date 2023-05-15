@@ -28,7 +28,7 @@ class LoginPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: const [
-                      ResetPasswordButton(),
+                      GoPasswordResetButton(),
                       GoSignupButton(),
                     ],
                   ),
@@ -183,14 +183,14 @@ class PasswordInput extends StatelessWidget {
   }
 }
 
-class ResetPasswordButton extends StatelessWidget {
-  const ResetPasswordButton({super.key});
+class GoPasswordResetButton extends StatelessWidget {
+  const GoPasswordResetButton({super.key});
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () {
-        Navigator.of(context).pushNamed('/signup');
+        Navigator.of(context).pushNamed('/password_reset');
       },
       child: Text(
         '비밀번호 재설정',

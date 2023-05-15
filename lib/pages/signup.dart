@@ -28,7 +28,7 @@ class _SignupPageState extends State<SignupPage> {
         ),
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 22.w),
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
             child: Center(
               child: GestureDetector(
                 onTap: () {
