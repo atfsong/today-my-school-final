@@ -6,11 +6,13 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:today_my_school_final/models/model_reservation.dart';
 import 'package:today_my_school_final/models/model_reserve.dart';
-import 'package:today_my_school_final/samples/room.dart';
+import 'package:today_my_school_final/data/room.dart';
 import 'package:today_my_school_final/style.dart';
 
 class ReservationForm extends StatefulWidget {
-  const ReservationForm({super.key});
+  const ReservationForm({super.key, this.room});
+
+  final Room? room;
 
   @override
   State<ReservationForm> createState() => _ReservationFormState();
@@ -18,11 +20,35 @@ class ReservationForm extends StatefulWidget {
 
 class _ReservationFormState extends State<ReservationForm> {
   static final _formKey = GlobalKey<FormState>();
-  final String _place = rooms[0].place;
-  final String _location = rooms[0].location;
-  final int _maxTime = rooms[0].maxTime;
-  final int _maxCapacity = rooms[0].maxCapacity;
-  final String _image = rooms[0].image;
+
+  static String name = '';
+  static String phone = '';
+
+  Future _getUser() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get()
+        .then(
+      (snapshot) {
+        if (snapshot.exists) {
+          setState(() {
+            name = snapshot.data()!['name'];
+            phone = snapshot.data()!['phone'];
+            snapshot.data()!['uid'];
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getUser();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,19 +67,19 @@ class _ReservationFormState extends State<ReservationForm> {
               onTap: () {
                 FocusScope.of(context).unfocus();
               },
-              child: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
                   child: Column(
                     children: [
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         child: RoomInfo(
-                            place: _place,
-                            location: _location,
-                            maxTime: _maxTime,
-                            maxCapacity: _maxCapacity,
-                            image: _image),
+                            place: widget.room!.place,
+                            location: widget.room!.location,
+                            maxTime: widget.room!.maxTime,
+                            maxCapacity: widget.room!.maxCapacity,
+                            image: widget.room!.image),
                       ),
                       Container(
                         height: 16.h,
@@ -76,13 +102,15 @@ class _ReservationFormState extends State<ReservationForm> {
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            InputGuide(),
-                            NameDisplay(),
-                            PhoneDisplay(),
-                            TimeDisplay(),
-                            NumOfPeopleInput(),
-                            PurposeInput(),
+                          children: [
+                            const InputGuide(),
+                            SizedBox(height: 16.h),
+                            const NameDisplay(),
+                            const PhoneDisplay(),
+                            /*DateDisplay(),
+                            TimeDisplay(),*/
+                            const NumOfPeopleInput(),
+                            const PurposeInput(),
                           ],
                         ),
                       ),
@@ -266,49 +294,16 @@ class InputGuide extends StatelessWidget {
   }
 }
 
-class NameDisplay extends StatefulWidget {
+class NameDisplay extends StatelessWidget {
   const NameDisplay({super.key});
 
   @override
-  State<NameDisplay> createState() => _NameDisplayState();
-}
-
-class _NameDisplayState extends State<NameDisplay> {
-  String name = '';
-  String phone = '';
-
-  Future _getUser() async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get()
-        .then(
-      (snapshot) async {
-        if (snapshot.exists) {
-          setState(() {
-            name = snapshot.data()!['name'];
-            phone = snapshot.data()!['phone'];
-            snapshot.data()!['uid'];
-          });
-        }
-      },
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _getUser();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final reserveField = Provider.of<ReserveFieldModel>(context, listen: false);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Padding(
-          padding: EdgeInsets.only(left: 8.w),
+          padding: EdgeInsets.fromLTRB(8.w, 0, 0, 22.h),
           child: Text(
             '이름',
             style: TextStyleSet.light13,
@@ -318,7 +313,7 @@ class _NameDisplayState extends State<NameDisplay> {
           width: 192.w,
           height: 64.h,
           child: TextFormField(
-            initialValue: name.isEmpty ? '이름' : name,
+            initialValue: _ReservationFormState.name,
             style: TextStyleSet.regular15,
             decoration: InputDecoration(
               helperText: '',
@@ -326,39 +321,13 @@ class _NameDisplayState extends State<NameDisplay> {
                   TextStyleSet.light11.copyWith(color: ColorPalette.red),
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              filled: true,
+              fillColor: ColorPalette.lightGrey.withOpacity(0.2),
               disabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 borderSide: BorderSide(
                   color: ColorPalette.grey,
                   width: 1,
-                ),
-              ),
-              enabledBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.grey,
-                  width: 1,
-                ),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.blue,
-                  width: 2,
-                ),
-              ),
-              errorBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.red,
-                  width: 1,
-                ),
-              ),
-              focusedErrorBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.red,
-                  width: 2,
                 ),
               ),
             ),
@@ -371,40 +340,56 @@ class _NameDisplayState extends State<NameDisplay> {
   }
 }
 
-class PhoneDisplay extends StatefulWidget {
+class PhoneDisplay extends StatelessWidget {
   const PhoneDisplay({super.key});
 
   @override
-  State<PhoneDisplay> createState() => _PhoneDisplayState();
-}
-
-class _PhoneDisplayState extends State<PhoneDisplay> {
-  String name = '';
-  String phone = '';
-
-  Future _getUser() async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get()
-        .then(
-      (snapshot) async {
-        if (snapshot.exists) {
-          setState(() {
-            name = snapshot.data()!['name'];
-            phone = snapshot.data()!['phone'];
-            snapshot.data()!['uid'];
-          });
-        }
-      },
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(8.w, 0, 0, 22.h),
+          child: Text(
+            '연락처',
+            style: TextStyleSet.light13,
+          ),
+        ),
+        SizedBox(
+          width: 192.w,
+          height: 64.h,
+          child: TextFormField(
+            initialValue:
+                '${_ReservationFormState.phone.substring(0, 3)}-${_ReservationFormState.phone.substring(3, 7)}-${_ReservationFormState.phone.substring(7)}',
+            style: TextStyleSet.regular15,
+            decoration: InputDecoration(
+              helperText: '',
+              errorStyle:
+                  TextStyleSet.light11.copyWith(color: ColorPalette.red),
+              isDense: true,
+              contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              filled: true,
+              fillColor: ColorPalette.lightGrey.withOpacity(0.2),
+              disabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  color: ColorPalette.grey,
+                  width: 1,
+                ),
+              ),
+            ),
+            enabled: false,
+            cursorColor: ColorPalette.black,
+          ),
+        ),
+      ],
     );
   }
+}
 
-  @override
-  void initState() {
-    super.initState();
-    _getUser();
-  }
+/*
+class DateDisplay extends StatelessWidget {
+  const DateDisplay({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -415,7 +400,7 @@ class _PhoneDisplayState extends State<PhoneDisplay> {
         Padding(
           padding: EdgeInsets.only(left: 8.w),
           child: Text(
-            '연락처',
+            '이용 날짜',
             style: TextStyleSet.light13,
           ),
         ),
@@ -423,9 +408,7 @@ class _PhoneDisplayState extends State<PhoneDisplay> {
           width: 192.w,
           height: 64.h,
           child: TextFormField(
-            initialValue: phone.isEmpty
-                ? '연락처'
-                : '${phone.substring(0, 3)}-${phone.substring(3, 7)}-${phone.substring(7)}',
+            initialValue: '이용 날짜',
             style: TextStyleSet.regular15,
             decoration: InputDecoration(
               helperText: '',
@@ -550,6 +533,7 @@ class TimeDisplay extends StatelessWidget {
     );
   }
 }
+*/
 
 class NumOfPeopleInput extends StatelessWidget {
   const NumOfPeopleInput({super.key});
@@ -561,7 +545,7 @@ class NumOfPeopleInput extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Padding(
-          padding: EdgeInsets.only(left: 8.w),
+          padding: EdgeInsets.fromLTRB(8.w, 0, 0, 22.h),
           child: Text(
             '이용 인원',
             style: TextStyleSet.light13,
@@ -573,11 +557,14 @@ class NumOfPeopleInput extends StatelessWidget {
           child: TextFormField(
             keyboardType: TextInputType.number,
             onChanged: (numOfPeople) {
-              reserveField.setNumOfPeople(0);
+              reserveField.setNumOfPeople(int.parse(numOfPeople));
             },
             validator: (numOfPeople) {
               if (numOfPeople!.trim().isEmpty) {
                 return '이용 인원을 입력하세요';
+              }
+              if (int.parse(numOfPeople) > 4) {
+                return '최대 이용 인원을 초과했습니다';
               }
               return null;
             },
@@ -635,7 +622,7 @@ class PurposeInput extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Padding(
-          padding: EdgeInsets.only(left: 8.w),
+          padding: EdgeInsets.fromLTRB(8.w, 0, 0, 22.h),
           child: Text(
             '이용 목적',
             style: TextStyleSet.light13,
