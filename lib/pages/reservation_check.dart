@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:today_my_school_final/samples/reservation.dart';
+import 'package:today_my_school_final/data/reservation.dart';
 import 'package:today_my_school_final/style.dart';
 
 class ReservationCheckPage extends StatefulWidget {
@@ -22,33 +22,31 @@ class _ReservationCheckPageState extends State<ReservationCheckPage> {
       ),
       body: SafeArea(
         bottom: false,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40.w),
-          child: Center(
-            child: ListView.separated(
-              separatorBuilder: (context, index) {
-                return SizedBox(height: 16.h);
-              },
-              itemCount: reservations.length,
-              itemBuilder: (context, index) {
-                if (reservations[index].startTime.isBefore(DateTime.now())) {
-                  return OverdueCard(
-                    place: reservations[index].place,
-                    date: reservations[index].date,
-                    startTime: reservations[index].startTime,
-                    endTime: reservations[index].endTime,
-                    numOfPeople: reservations[index].numOfPeople,
-                  );
-                }
-                return ReservationCard(
+        child: Center(
+          child: ListView.separated(
+            padding: EdgeInsets.symmetric(horizontal: 40.w),
+            separatorBuilder: (context, index) {
+              return SizedBox(height: 16.h);
+            },
+            itemCount: reservations.length,
+            itemBuilder: (context, index) {
+              if (reservations[index].startTime.isBefore(DateTime.now())) {
+                return OverdueCard(
                   place: reservations[index].place,
                   date: reservations[index].date,
                   startTime: reservations[index].startTime,
                   endTime: reservations[index].endTime,
                   numOfPeople: reservations[index].numOfPeople,
                 );
-              },
-            ),
+              }
+              return ReservationCard(
+                place: reservations[index].place,
+                date: reservations[index].date,
+                startTime: reservations[index].startTime,
+                endTime: reservations[index].endTime,
+                numOfPeople: reservations[index].numOfPeople,
+              );
+            },
           ),
         ),
       ),
@@ -136,7 +134,7 @@ class ReservationCard extends StatelessWidget {
               child: Row(
                 children: [
                   SizedBox(
-                    width: 104.w,
+                    width: 112.w,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -156,14 +154,13 @@ class ReservationCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 160.w,
+                    width: 144.w,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          DateFormat('yyyy년 MM월 dd일 EEEE', 'ko_KR')
-                              .format(date),
+                          DateFormat('yyyy년 M월 d일 EEEE', 'ko_KR').format(date),
                           style: TextStyleSet.semibold13,
                         ),
                         Text(
@@ -267,7 +264,7 @@ class OverdueCard extends StatelessWidget {
               child: Row(
                 children: [
                   SizedBox(
-                    width: 120.w,
+                    width: 112.w,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -298,7 +295,7 @@ class OverdueCard extends StatelessWidget {
                               .copyWith(color: ColorPalette.grey),
                         ),
                         Text(
-                          '${DateFormat('HH:mm').format(startTime)}-${DateFormat('HH:mm').format(endTime)}',
+                          '${DateFormat('HH:mm').format(startTime)} - ${DateFormat('HH:mm').format(endTime)}',
                           style: TextStyleSet.semibold13
                               .copyWith(color: ColorPalette.grey),
                         ),

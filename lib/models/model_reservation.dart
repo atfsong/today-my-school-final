@@ -10,7 +10,7 @@ enum ReservationStatus {
 class ReservationModel with ChangeNotifier {
   final User? _user = FirebaseAuth.instance.currentUser;
 
-  Future reserveRoom(
+  Future<ReservationStatus> reserveRoom(
     String place,
     DateTime date,
     DateTime startTime,
@@ -20,7 +20,7 @@ class ReservationModel with ChangeNotifier {
   ) async {
     CollectionReference reservations =
         FirebaseFirestore.instance.collection('reservations');
-    String uid = _user!.uid.toString();
+    String uid = _user!.uid;
     try {
       await reservations.doc().set({
         'place': place,

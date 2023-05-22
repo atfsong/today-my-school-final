@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
               scaffoldBackgroundColor: ColorPalette.white,
               dividerTheme: DividerThemeData(
                 color: ColorPalette.grey,
-                space: 16.h,
+                space: 24.h,
                 thickness: 1,
               ),
             ),
