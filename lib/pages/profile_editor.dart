@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:today_my_school_final/models/model_auth.dart';
 import 'package:today_my_school_final/models/model_editor.dart';
-import 'package:today_my_school_final/models/model_user.dart';
 import 'package:today_my_school_final/style.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +26,7 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get()
         .then(
-      (snapshot) async {
+      (snapshot) {
         if (snapshot.exists) {
           setState(() {
             email = snapshot.data()!['email'];
@@ -43,13 +42,14 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
   @override
   void initState() {
     super.initState();
-    _getUser();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getUser();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthModel>(context, listen: false);
-
     return ChangeNotifierProvider(
       create: (_) => EditorFieldModel(),
       child: Scaffold(
@@ -76,49 +76,60 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
           ],
         ),
         body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Center(
-              child: GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).unfocus();
-                },
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 8.h),
-                              const InputGuide(),
-                              const Divider(),
-                              const EmailInput(),
-                              const Divider(),
-                              const PasswordInput(),
-                              const Divider(),
-                              const PasswordConfirmInput(),
-                              const Divider(),
-                              const NameInput(),
-                              const Divider(),
-                              const PhoneInput(),
-                              const Divider(),
-                            ],
+          child: Center(
+            child: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+              },
+              child: CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 24.w),
+                            child: Center(
+                              child: Form(
+                                key: _formKey,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 8.h),
+                                        const InputGuide(),
+                                        const Divider(),
+                                        const EmailInput(),
+                                        const PasswordInput(),
+                                        const PasswordConfirmInput(),
+                                        const NameInput(),
+                                        const PhoneInput(),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 16.h, 0, 40.h),
+                                      child: const EditButton(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                      const EditButton(),
-                      SizedBox(height: 40.h),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
         ),
-        resizeToAvoidBottomInset: false,
       ),
     );
   }
@@ -165,6 +176,9 @@ class EmailInput extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
             onChanged: (email) {
               editorField.setEmail(email);
+            },
+            onSaved: (email) {
+              editorField.setEmail(email!);
             },
             validator: (email) {
               if (email!.trim().isEmpty || !email.contains('kmou.ac.kr')) {
@@ -221,7 +235,6 @@ class PasswordInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final editorField = Provider.of<EditorFieldModel>(context, listen: false);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -236,15 +249,6 @@ class PasswordInput extends StatelessWidget {
           width: 192.w,
           height: 64.h,
           child: TextFormField(
-            onChanged: (password) {
-              editorField.setPassword(password);
-            },
-            validator: (password) {
-              if (password!.trim().isEmpty || password.length < 6) {
-                return '6자리 이상의 비밀번호를 입력하세요';
-              }
-              return null;
-            },
             style: TextStyleSet.regular15,
             obscureText: true,
             decoration: InputDecoration(
@@ -253,39 +257,13 @@ class PasswordInput extends StatelessWidget {
                   TextStyleSet.light11.copyWith(color: ColorPalette.red),
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              filled: true,
+              fillColor: ColorPalette.lightGrey.withOpacity(0.2),
               disabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 borderSide: BorderSide(
                   color: ColorPalette.grey,
                   width: 1,
-                ),
-              ),
-              enabledBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.grey,
-                  width: 1,
-                ),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.blue,
-                  width: 2,
-                ),
-              ),
-              errorBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.red,
-                  width: 1,
-                ),
-              ),
-              focusedErrorBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.red,
-                  width: 2,
                 ),
               ),
             ),
@@ -303,7 +281,6 @@ class PasswordConfirmInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final editorField = Provider.of<EditorFieldModel>(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -318,53 +295,21 @@ class PasswordConfirmInput extends StatelessWidget {
           width: 192.w,
           height: 64.h,
           child: TextFormField(
-            onChanged: (passwordConfirm) {
-              editorField.setPasswordConfirm(passwordConfirm);
-            },
             style: TextStyleSet.regular15,
             obscureText: true,
             decoration: InputDecoration(
               helperText: '',
-              errorText: editorField.password != editorField.passwordConfirm
-                  ? '비밀번호가 일치하지 않아요'
-                  : null,
               errorStyle:
                   TextStyleSet.light11.copyWith(color: ColorPalette.red),
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              filled: true,
+              fillColor: ColorPalette.lightGrey.withOpacity(0.2),
               disabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 borderSide: BorderSide(
                   color: ColorPalette.grey,
                   width: 1,
-                ),
-              ),
-              enabledBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.grey,
-                  width: 1,
-                ),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.blue,
-                  width: 2,
-                ),
-              ),
-              errorBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.red,
-                  width: 1,
-                ),
-              ),
-              focusedErrorBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                borderSide: BorderSide(
-                  color: ColorPalette.red,
-                  width: 2,
                 ),
               ),
             ),
@@ -400,6 +345,9 @@ class NameInput extends StatelessWidget {
             initialValue: _ProfileEditorPageState.name,
             onChanged: (name) {
               editorField.setName(name);
+            },
+            onSaved: (name) {
+              editorField.setName(name!);
             },
             validator: (name) {
               if (name!.trim().isEmpty) {
@@ -476,6 +424,9 @@ class PhoneInput extends StatelessWidget {
             onChanged: (phone) {
               editorField.setPhone(phone);
             },
+            onSaved: (phone) {
+              editorField.setPhone(phone!);
+            },
             validator: (phone) {
               if (phone!.trim().isEmpty || phone.length < 10) {
                 return '전화번호를 입력하세요';
@@ -531,7 +482,7 @@ class EditButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserModel>(context, listen: false);
+    final auth = Provider.of<AuthModel>(context, listen: false);
     final editorField = Provider.of<EditorFieldModel>(context, listen: false);
     return SizedBox(
       width: 128.w,
@@ -546,12 +497,9 @@ class EditButton extends StatelessWidget {
         onPressed: () async {
           if (_ProfileEditorPageState._formKey.currentState!.validate()) {
             _ProfileEditorPageState._formKey.currentState!.save();
-            await user
-                .updateUser(
-                    editorField.email, editorField.name, editorField.phone)
-                .then(
-              (userStatus) {
-                if (userStatus == UserStatus.updateSuccess) {
+            await auth.updateUser(editorField).then(
+              (updateStatus) {
+                if (updateStatus == AuthStatus.updateSuccess) {
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
