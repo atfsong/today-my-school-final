@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:today_my_school_final/models/model_auth.dart';
 import 'package:today_my_school_final/models/model_signup.dart';
-import 'package:today_my_school_final/models/model_user.dart';
 import 'package:today_my_school_final/style.dart';
 
 class SignupPage extends StatefulWidget {
@@ -27,49 +26,58 @@ class _SignupPageState extends State<SignupPage> {
           title: const Text('회원가입'),
         ),
         body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Center(
-              child: GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).unfocus();
-                },
-                child: Form(
-                  key: _formKey,
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Column(
                     children: [
                       Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 8.h),
-                              const InputGuide(),
-                              const Divider(),
-                              const EmailInput(),
-                              const Divider(),
-                              const PasswordInput(),
-                              const Divider(),
-                              const PasswordConfirmInput(),
-                              const Divider(),
-                              const NameInput(),
-                              const Divider(),
-                              const PhoneInput(),
-                              const Divider(),
-                            ],
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 24.w),
+                          child: Center(
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(height: 8.h),
+                                      const InputGuide(),
+                                      const Divider(),
+                                      const EmailInput(),
+                                      const PasswordInput(),
+                                      const PasswordConfirmInput(),
+                                      const NameInput(),
+                                      const PhoneInput(),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.fromLTRB(0, 16.h, 0, 40.h),
+                                    child: const SignupButton(),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                      const SignupButton(),
-                      SizedBox(height: 40.h),
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
-        resizeToAvoidBottomInset: false,
       ),
     );
   }
@@ -469,7 +477,6 @@ class SignupButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthModel>(context, listen: false);
-    final user = Provider.of<UserModel>(context, listen: false);
     final signupField = Provider.of<SignupFieldModel>(context, listen: false);
     return SizedBox(
       width: 128.w,
@@ -483,12 +490,9 @@ class SignupButton extends StatelessWidget {
         ),
         onPressed: () async {
           if (_SignupPageState._formKey.currentState!.validate()) {
-            await auth
-                .signupWithEmail(signupField.email, signupField.password)
-                .then(
+            await auth.signupWithEmail(signupField).then(
               (signupStatus) {
                 if (signupStatus == AuthStatus.signupSuccess) {
-                  user.addUser(signupField.name, signupField.phone);
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
