@@ -2,23 +2,11 @@ import 'package:flutter/material.dart';
 
 class EditorFieldModel extends ChangeNotifier {
   String email = '';
-  String password = '';
-  String passwordConfirm = '';
   String name = '';
   String phone = '';
 
   void setEmail(String email) {
     this.email = email;
-    notifyListeners();
-  }
-
-  void setPassword(String password) {
-    this.password = password;
-    notifyListeners();
-  }
-
-  void setPasswordConfirm(String passwordConfirm) {
-    this.passwordConfirm = passwordConfirm;
     notifyListeners();
   }
 

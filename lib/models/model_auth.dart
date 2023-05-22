@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:today_my_school_final/models/model_editor.dart';
+import 'package:today_my_school_final/models/model_signup.dart';
 
 enum AuthStatus {
   signupSuccess,
@@ -9,6 +12,10 @@ enum AuthStatus {
   loginFail,
   resetSuccess,
   resetFail,
+  addSuccess,
+  addFail,
+  updateSuccess,
+  updateFail,
 }
 
 class AuthModel with ChangeNotifier {
@@ -17,14 +24,35 @@ class AuthModel with ChangeNotifier {
 
   AuthModel({auth}) : _auth = auth ?? FirebaseAuth.instance;
 
-  Future<AuthStatus> signupWithEmail(String email, String password) async {
+  Future<AuthStatus> signupWithEmail(SignupFieldModel signupField) async {
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+          email: signupField.email, password: signupField.password);
+      AuthStatus addUserStatus =
+          await addUser(credential.user!.uid, signupField);
+      if (addUserStatus == AuthStatus.addFail) {
+        return AuthStatus.signupFail;
+      }
       return AuthStatus.signupSuccess;
     } catch (e) {
       print(e);
       return AuthStatus.signupFail;
+    }
+  }
+
+  Future<AuthStatus> addUser(String uid, SignupFieldModel signupField) async {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    try {
+      await users.doc(uid).set({
+        'email': signupField.email,
+        'name': signupField.name,
+        'phone': signupField.phone,
+        'uid': uid,
+      });
+      return AuthStatus.addSuccess;
+    } catch (e) {
+      print(e);
+      return AuthStatus.addFail;
     }
   }
 
@@ -44,6 +72,23 @@ class AuthModel with ChangeNotifier {
     } catch (e) {
       print(e);
       return AuthStatus.loginFail;
+    }
+  }
+
+  Future<AuthStatus> updateUser(EditorFieldModel editorField) async {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    String uid = _user!.uid;
+    try {
+      await users.doc(uid).set({
+        'email': editorField.email,
+        'name': editorField.name,
+        'phone': editorField.phone,
+        'uid': uid,
+      });
+      return AuthStatus.updateSuccess;
+    } catch (e) {
+      print(e);
+      return AuthStatus.updateFail;
     }
   }
 
