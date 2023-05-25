@@ -48,6 +48,13 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
   }
 
   @override
+  void setState(VoidCallback fn) {
+    // TODO: implement setState
+    super.setState(fn);
+    _getUser();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthModel>(context, listen: false);
     return ChangeNotifierProvider(
@@ -75,60 +82,69 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
             ),
           ],
         ),
-        body: SafeArea(
-          child: Center(
-            child: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).unfocus();
-              },
-              child: CustomScrollView(
-                slivers: [
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 24.w),
-                            child: Center(
-                              child: Form(
-                                key: _formKey,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 8.h),
-                                        const InputGuide(),
-                                        const Divider(),
-                                        const EmailInput(),
-                                        const PasswordInput(),
-                                        const PasswordConfirmInput(),
-                                        const NameInput(),
-                                        const PhoneInput(),
-                                      ],
+        body: Builder(
+          builder: (BuildContext context) {
+            if (email.isNotEmpty) {
+              return SafeArea(
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                    },
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 24.w),
+                                  child: Center(
+                                    child: Form(
+                                      key: _formKey,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(height: 8.h),
+                                              const InputGuide(),
+                                              const Divider(),
+                                              const EmailInput(),
+                                              const PasswordInput(),
+                                              const PasswordConfirmInput(),
+                                              const NameInput(),
+                                              const PhoneInput(),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                0, 16.h, 0, 40.h),
+                                            child: const EditButton(),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(0, 16.h, 0, 40.h),
-                                      child: const EditButton(),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                ),
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
         ),
       ),
     );
