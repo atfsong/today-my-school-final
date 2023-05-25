@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:today_my_school_final/data/reservation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:today_my_school_final/style.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ReservationCheckPage extends StatefulWidget {
   const ReservationCheckPage({super.key});
@@ -12,6 +13,11 @@ class ReservationCheckPage extends StatefulWidget {
 }
 
 class _ReservationCheckPageState extends State<ReservationCheckPage> {
+  CollectionReference product = FirebaseFirestore.instance
+      .collection('users')
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .collection('reservations');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,36 +26,82 @@ class _ReservationCheckPageState extends State<ReservationCheckPage> {
         foregroundColor: ColorPalette.blue,
         title: const Text('내 예약'),
       ),
-      body: SafeArea(
-        bottom: false,
-        child: Center(
-          child: ListView.separated(
-            padding: EdgeInsets.symmetric(horizontal: 40.w),
-            separatorBuilder: (context, index) {
-              return SizedBox(height: 16.h);
-            },
-            itemCount: reservations.length,
-            itemBuilder: (context, index) {
-              if (reservations[index].startTime.isBefore(DateTime.now())) {
-                return OverdueCard(
-                  place: reservations[index].place,
-                  date: reservations[index].date,
-                  startTime: reservations[index].startTime,
-                  endTime: reservations[index].endTime,
-                  numOfPeople: reservations[index].numOfPeople,
-                );
-              }
-              return ReservationCard(
-                place: reservations[index].place,
-                date: reservations[index].date,
-                startTime: reservations[index].startTime,
-                endTime: reservations[index].endTime,
-                numOfPeople: reservations[index].numOfPeople,
-              );
-            },
-          ),
-        ),
+      body: StreamBuilder(
+        stream: product.snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return SafeArea(
+              bottom: false,
+              child: Center(
+                child: ListView.separated(
+                  padding: EdgeInsets.symmetric(horizontal: 40.w),
+                  separatorBuilder: (context, index) {
+                    return SizedBox(height: 16.h);
+                  },
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    final DocumentSnapshot documentSnapshot =
+                        snapshot.data!.docs[index];
+                    DateTime dataToDate = documentSnapshot['date'].toDate();
+                    DateTime startTimeToDate =
+                        documentSnapshot['startTime'].toDate();
+                    DateTime endTimeToDate =
+                        documentSnapshot['endTime'].toDate();
+                    if (startTimeToDate.isBefore(DateTime.now())) {
+                      return OverdueCard(
+                        place: documentSnapshot['place'],
+                        date: dataToDate,
+                        startTime: startTimeToDate,
+                        endTime: endTimeToDate,
+                        numOfPeople: documentSnapshot['numOfPeople'],
+                      );
+                    }
+                    return ReservationCard(
+                      place: documentSnapshot['place'],
+                      date: dataToDate,
+                      startTime: startTimeToDate,
+                      endTime: endTimeToDate,
+                      numOfPeople: documentSnapshot['numOfPeople'],
+                    );
+                  },
+                ),
+              ),
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
       ),
+      // body: SafeArea(
+      //   bottom: false,
+      //   child: Center(
+      //     child: ListView.separated(
+      //       padding: EdgeInsets.symmetric(horizontal: 40.w),
+      //       separatorBuilder: (context, index) {
+      //         return SizedBox(height: 16.h);
+      //       },
+      //       itemCount: reservations.length,
+      //       itemBuilder: (context, index) {
+      //         if (reservations[index].startTime.isBefore(DateTime.now())) {
+      //           return OverdueCard(
+      //             place: reservations[index].place,
+      //             date: reservations[index].date,
+      //             startTime: reservations[index].startTime,
+      //             endTime: reservations[index].endTime,
+      //             numOfPeople: reservations[index].numOfPeople,
+      //           );
+      //         }
+      //         return ReservationCard(
+      //           place: reservations[index].place,
+      //           date: reservations[index].date,
+      //           startTime: reservations[index].startTime,
+      //           endTime: reservations[index].endTime,
+      //           numOfPeople: reservations[index].numOfPeople,
+      //         );
+      //       },
+      //     ),
+      //   ),
+      // ),
     );
   }
 }
