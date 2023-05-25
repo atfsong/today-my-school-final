@@ -51,6 +51,13 @@ class _ReservationFormState extends State<ReservationForm> {
   }
 
   @override
+  void setState(VoidCallback fn) {
+    // TODO: implement setState
+    super.setState(fn);
+    _getUser();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ReserveFieldModel(),
@@ -60,68 +67,125 @@ class _ReservationFormState extends State<ReservationForm> {
           foregroundColor: ColorPalette.blue,
           title: const Text('예약 정보 입력'),
         ),
-        body: SafeArea(
-          bottom: false,
-          child: Center(
-            child: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).unfocus();
-              },
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        child: RoomInfo(
-                            place: widget.room!.place,
-                            location: widget.room!.location,
-                            maxTime: widget.room!.maxTime,
-                            maxCapacity: widget.room!.maxCapacity,
-                            image: widget.room!.image),
-                      ),
-                      Container(
-                        height: 16.h,
-                        color: ColorPalette.blue.withOpacity(0.05),
-                      ),
-                      const DatePicker(),
-                      Container(
-                        height: 16.h,
-                        color: ColorPalette.blue.withOpacity(0.05),
-                      ),
-                      const TimePicker(),
-                      Container(
-                        height: 16.h,
-                        color: ColorPalette.blue.withOpacity(0.05),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24.w,
-                          vertical: 16.h,
-                        ),
+        body: Builder(
+          builder: (BuildContext context) {
+            final reserveField =
+                Provider.of<ReserveFieldModel>(context, listen: false);
+            reserveField.place = widget.room!.place;
+            if (phone.isNotEmpty) {
+              return SafeArea(
+                bottom: false,
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                    },
+                    child: SingleChildScrollView(
+                      child: Form(
+                        key: _formKey,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const InputGuide(),
-                            SizedBox(height: 16.h),
-                            const NameDisplay(),
-                            const PhoneDisplay(),
-                            /*DateDisplay(),
-                            TimeDisplay(),*/
-                            const NumOfPeopleInput(),
-                            const PurposeInput(),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              child: RoomInfo(
+                                  place: widget.room!.place,
+                                  location: widget.room!.location,
+                                  maxTime: widget.room!.maxTime,
+                                  maxCapacity: widget.room!.maxCapacity,
+                                  image: widget.room!.image),
+                            ),
+                            Container(
+                              height: 16.h,
+                              color: ColorPalette.blue.withOpacity(0.05),
+                            ),
+                            const DatePicker(),
+                            Container(
+                              height: 16.h,
+                              color: ColorPalette.blue.withOpacity(0.05),
+                            ),
+                            const TimePicker(),
+                            Container(
+                              height: 16.h,
+                              color: ColorPalette.blue.withOpacity(0.05),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 24.w,
+                                vertical: 16.h,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const InputGuide(),
+                                  SizedBox(height: 16.h),
+                                  //const NameDisplay(),
+                                  //const PhoneDisplay(),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            8.w, 0, 0, 22.h),
+                                        child: Text(
+                                          "이름",
+                                          style: TextStyleSet.light13,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 192.w,
+                                        height: 40.h,
+                                        child: Text(
+                                          name,
+                                          style: TextStyleSet.regular15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  //이름
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            8.w, 0, 0, 22.h),
+                                        child: Text(
+                                          "연락처",
+                                          style: TextStyleSet.light13,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 192.w,
+                                        height: 40.h,
+                                        child: Text(
+                                          '${_ReservationFormState.phone.substring(0, 3)}-${_ReservationFormState.phone.substring(3, 7)}-${_ReservationFormState.phone.substring(7)}',
+                                          style: TextStyleSet.regular15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  //연락처
+                                  /*DateDisplay(),
+                                TimeDisplay(),*/
+                                  const NumOfPeopleInput(),
+                                  const PurposeInput(),
+                                ],
+                              ),
+                            ),
+                            const ReserveButton(),
+                            SizedBox(height: 40.h),
                           ],
                         ),
                       ),
-                      const ReserveButton(),
-                      SizedBox(height: 40.h),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
         ),
       ),
     );
@@ -690,7 +754,6 @@ class ReserveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reservation = Provider.of<ReservationModel>(context, listen: false);
     final reserveField = Provider.of<ReserveFieldModel>(context, listen: false);
     return SizedBox(
       width: 128.w,
@@ -704,30 +767,38 @@ class ReserveButton extends StatelessWidget {
         ),
         onPressed: () async {
           if (_ReservationFormState._formKey.currentState!.validate()) {
-            await reservation
-                .reserveRoom(
-              reserveField.place,
-              reserveField.date,
-              reserveField.startTime,
-              reserveField.endTime,
-              reserveField.numOfPeople,
-              reserveField.purpose,
-            )
-                .then(
-              (reservationStatus) {
-                if (reservationStatus == ReservationStatus.success) {
-                  Navigator.of(context)
-                      .pushReplacementNamed('/reservation_result');
-                } else {
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(
-                      const SnackBar(content: Text('예약에 실패했어요 다시 시도해주세요')),
-                    );
-                  Navigator.pop(context);
-                }
-              },
-            );
+            try {
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .collection('reservations')
+                  .doc()
+                  .set({
+                'place': reserveField.place,
+                'date': reserveField.date,
+                'startTime': reserveField.startTime,
+                'endTime': reserveField.endTime,
+                'numOfPeople': reserveField.numOfPeople,
+                'purpose': reserveField.purpose,
+                'uid': FirebaseAuth.instance.currentUser!.uid,
+              });
+              Navigator.of(context).pushReplacementNamed('/reservation_result');
+            } catch (e) {
+              print(e);
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  const SnackBar(content: Text('예약에 실패했어요 다시 시도해주세요')),
+                );
+              Navigator.pop(context);
+            }
+          } else {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(content: Text('예약에 실패했어요 다시 시도해주세요')),
+              );
+            Navigator.pop(context);
           }
         },
         child: Text(
@@ -738,3 +809,57 @@ class ReserveButton extends StatelessWidget {
     );
   }
 }
+
+// class ReserveButton extends StatelessWidget {
+//   const ReserveButton({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final reservation = Provider.of<ReservationModel>(context, listen: false);
+//     final reserveField = Provider.of<ReserveFieldModel>(context, listen: false);
+//     return SizedBox(
+//       width: 128.w,
+//       height: 40.h,
+//       child: ElevatedButton(
+//         style: ElevatedButton.styleFrom(
+//           backgroundColor: ColorPalette.blue,
+//           shape: RoundedRectangleBorder(
+//             borderRadius: BorderRadius.circular(30),
+//           ),
+//         ),
+//         onPressed: () async {
+//           if (_ReservationFormState._formKey.currentState!.validate()) {
+//             await reservation
+//                 .reserveRoom(
+//               reserveField.place,
+//               reserveField.date,
+//               reserveField.startTime,
+//               reserveField.endTime,
+//               reserveField.numOfPeople,
+//               reserveField.purpose,
+//             )
+//                 .then(
+//               (reservationStatus) {
+//                 if (reservationStatus == ReservationStatus.success) {
+//                   Navigator.of(context)
+//                       .pushReplacementNamed('/reservation_result');
+//                 } else {
+//                   ScaffoldMessenger.of(context)
+//                     ..hideCurrentSnackBar()
+//                     ..showSnackBar(
+//                       const SnackBar(content: Text('예약에 실패했어요 다시 시도해주세요')),
+//                     );
+//                   Navigator.pop(context);
+//                 }
+//               },
+//             );
+//           }
+//         },
+//         child: Text(
+//           '예약하기',
+//           style: TextStyleSet.bold16.copyWith(color: ColorPalette.white),
+//         ),
+//       ),
+//     );
+//   }
+// }
