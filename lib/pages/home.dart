@@ -123,6 +123,12 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
   }
 
   @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+    _getUser();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,

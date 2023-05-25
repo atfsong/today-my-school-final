@@ -127,7 +127,7 @@ class _ReservationFormState extends State<ReservationForm> {
               );
             }
             return const Center(
-              child: Text('로딩중'),
+              child: CircularProgressIndicator(),
             );
           },
         ),
