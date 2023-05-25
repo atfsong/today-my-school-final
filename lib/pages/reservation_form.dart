@@ -40,14 +40,12 @@ class _ReservationFormState extends State<ReservationForm> {
         }
       },
     );
+    return 'success';
   }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getUser();
-    });
   }
 
   @override
@@ -60,68 +58,78 @@ class _ReservationFormState extends State<ReservationForm> {
           foregroundColor: ColorPalette.blue,
           title: const Text('예약 정보 입력'),
         ),
-        body: SafeArea(
-          bottom: false,
-          child: Center(
-            child: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).unfocus();
-              },
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        child: RoomInfo(
-                            place: widget.room!.place,
-                            location: widget.room!.location,
-                            maxTime: widget.room!.maxTime,
-                            maxCapacity: widget.room!.maxCapacity,
-                            image: widget.room!.image),
-                      ),
-                      Container(
-                        height: 16.h,
-                        color: ColorPalette.blue.withOpacity(0.05),
-                      ),
-                      const DatePicker(),
-                      Container(
-                        height: 16.h,
-                        color: ColorPalette.blue.withOpacity(0.05),
-                      ),
-                      const TimePicker(),
-                      Container(
-                        height: 16.h,
-                        color: ColorPalette.blue.withOpacity(0.05),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24.w,
-                          vertical: 16.h,
-                        ),
+        body: FutureBuilder(
+          future: _getUser(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData) {
+              return SafeArea(
+                bottom: false,
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                    },
+                    child: SingleChildScrollView(
+                      child: Form(
+                        key: _formKey,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const InputGuide(),
-                            SizedBox(height: 16.h),
-                            const NameDisplay(),
-                            const PhoneDisplay(),
-                            /*DateDisplay(),
-                            TimeDisplay(),*/
-                            const NumOfPeopleInput(),
-                            const PurposeInput(),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              child: RoomInfo(
+                                  place: widget.room!.place,
+                                  location: widget.room!.location,
+                                  maxTime: widget.room!.maxTime,
+                                  maxCapacity: widget.room!.maxCapacity,
+                                  image: widget.room!.image),
+                            ),
+                            Container(
+                              height: 16.h,
+                              color: ColorPalette.blue.withOpacity(0.05),
+                            ),
+                            const DatePicker(),
+                            Container(
+                              height: 16.h,
+                              color: ColorPalette.blue.withOpacity(0.05),
+                            ),
+                            TimePicker(room: widget.room),
+                            Container(
+                              height: 16.h,
+                              color: ColorPalette.blue.withOpacity(0.05),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 24.w,
+                                vertical: 16.h,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const InputGuide(),
+                                  SizedBox(height: 16.h),
+                                  const NameDisplay(),
+                                  const PhoneDisplay(),
+                                  /*DateDisplay(),
+                                TimeDisplay(),*/
+                                  NumOfPeopleInput(room: widget.room),
+                                  const PurposeInput(),
+                                ],
+                              ),
+                            ),
+                            ReserveButton(room: widget.room),
+                            SizedBox(height: 40.h),
                           ],
                         ),
                       ),
-                      const ReserveButton(),
-                      SizedBox(height: 40.h),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
+              );
+            }
+            return const Center(
+              child: Text('로딩중'),
+            );
+          },
         ),
       ),
     );
@@ -209,12 +217,18 @@ class _DatePickerState extends State<DatePicker> {
     final reserveField = Provider.of<ReserveFieldModel>(context, listen: false);
     return ExpansionTile(
       title: const Text('날짜'),
+      tilePadding: EdgeInsets.symmetric(horizontal: 24.h),
+      childrenPadding: EdgeInsets.fromLTRB(32.h, 0, 32.h, 16.h),
+      iconColor: ColorPalette.black,
+      collapsedIconColor: ColorPalette.black,
+      textColor: ColorPalette.black,
+      collapsedTextColor: ColorPalette.black,
       children: [
         TableCalendar(
           locale: 'ko_KR',
           focusedDay: focusedDay,
-          firstDay: DateTime.utc(2023, 1, 1),
-          lastDay: DateTime.utc(2024, 12, 31),
+          firstDay: DateTime(2023, 1, 1),
+          lastDay: DateTime(2024, 12, 31),
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
               this.selectedDay = selectedDay;
@@ -226,23 +240,48 @@ class _DatePickerState extends State<DatePicker> {
               day.year == selectedDay.year &&
               day.month == selectedDay.month &&
               day.day == selectedDay.day,
-          headerStyle: const HeaderStyle(
+          headerStyle: HeaderStyle(
             formatButtonVisible: false,
+            titleTextStyle: TextStyleSet.regular18,
+            headerPadding: const EdgeInsets.only(top: 0),
+            leftChevronIcon: const Icon(
+              Icons.chevron_left_rounded,
+              size: 24,
+              color: ColorPalette.black,
+            ),
+            rightChevronIcon: const Icon(
+              Icons.chevron_right_rounded,
+              size: 24,
+              color: ColorPalette.black,
+            ),
+          ),
+          daysOfWeekHeight: 24.h,
+          daysOfWeekStyle: DaysOfWeekStyle(
+            weekdayStyle: TextStyleSet.light15,
+            weekendStyle:
+                TextStyleSet.light15.copyWith(color: ColorPalette.grey),
           ),
           calendarStyle: CalendarStyle(
-              todayTextStyle: const TextStyle(color: ColorPalette.black),
-              todayDecoration: BoxDecoration(
-                color: ColorPalette.blue.withOpacity(0.3),
-                shape: BoxShape.circle,
-              ),
-              selectedTextStyle: const TextStyle(color: ColorPalette.white),
-              selectedDecoration: const BoxDecoration(
-                color: ColorPalette.blue,
-                shape: BoxShape.circle,
-              ),
-              outsideTextStyle: const TextStyle(color: ColorPalette.grey),
-              disabledTextStyle: const TextStyle(color: ColorPalette.grey),
-              defaultTextStyle: const TextStyle(color: ColorPalette.black)),
+            cellMargin: const EdgeInsets.all(0),
+            todayTextStyle: TextStyleSet.regular18,
+            todayDecoration: BoxDecoration(
+              color: ColorPalette.blue.withOpacity(0.15),
+              shape: BoxShape.circle,
+            ),
+            selectedTextStyle:
+                TextStyleSet.medium18.copyWith(color: ColorPalette.white),
+            selectedDecoration: const BoxDecoration(
+              color: ColorPalette.blue,
+              shape: BoxShape.circle,
+            ),
+            outsideTextStyle:
+                TextStyleSet.light18.copyWith(color: ColorPalette.grey),
+            disabledTextStyle:
+                TextStyleSet.light18.copyWith(color: ColorPalette.grey),
+            weekendTextStyle:
+                TextStyleSet.light18.copyWith(color: ColorPalette.grey),
+            defaultTextStyle: TextStyleSet.regular18,
+          ),
         )
       ],
     );
@@ -250,7 +289,9 @@ class _DatePickerState extends State<DatePicker> {
 }
 
 class TimePicker extends StatefulWidget {
-  const TimePicker({super.key});
+  const TimePicker({super.key, this.room});
+
+  final Room? room;
 
   @override
   State<TimePicker> createState() => _TimePickerState();
@@ -259,19 +300,60 @@ class TimePicker extends StatefulWidget {
 class _TimePickerState extends State<TimePicker> {
   @override
   Widget build(BuildContext context) {
+    final reserveField = Provider.of<ReserveFieldModel>(context, listen: false);
     return ExpansionTile(
       title: const Text('시간'),
+      tilePadding: EdgeInsets.symmetric(horizontal: 24.h),
+      childrenPadding: EdgeInsets.only(bottom: 16.h),
+      iconColor: ColorPalette.black,
+      collapsedIconColor: ColorPalette.black,
+      textColor: ColorPalette.black,
+      collapsedTextColor: ColorPalette.black,
       children: [
-        ListView.separated(
-          scrollDirection: Axis.horizontal,
-          separatorBuilder: (context, index) {
-            return SizedBox(width: 8.h);
-          },
-          itemCount: 10,
-          itemBuilder: (context, index) {
-            return;
-          },
-        )
+        SizedBox(
+          height: 36.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: widget.room!.isAvailable.length,
+            itemBuilder: (context, index) {
+              if (widget.room!.isAvailable[index]['isReserved']) {
+                return Container(
+                  width: 100.w,
+                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                  decoration: BoxDecoration(
+                    color: ColorPalette.grey.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Center(
+                    child: Text(
+                      widget.room!.isAvailable[index]['time'],
+                      style: TextStyleSet.regular13
+                          .copyWith(color: ColorPalette.white),
+                    ),
+                  ),
+                );
+              }
+              return GestureDetector(
+                onTap: () {},
+                child: Container(
+                  width: 100.w,
+                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                  decoration: BoxDecoration(
+                    color: ColorPalette.white,
+                    border: Border.all(color: ColorPalette.blue),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Center(
+                    child: Text(
+                      widget.room!.isAvailable[index]['time'],
+                      style: TextStyleSet.regular13,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ],
     );
   }
@@ -322,7 +404,7 @@ class NameDisplay extends StatelessWidget {
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               filled: true,
-              fillColor: ColorPalette.lightGrey.withOpacity(0.2),
+              fillColor: ColorPalette.grey.withOpacity(0.15),
               disabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 borderSide: BorderSide(
@@ -359,8 +441,10 @@ class PhoneDisplay extends StatelessWidget {
           width: 192.w,
           height: 64.h,
           child: TextFormField(
-            initialValue:
-                '${_ReservationFormState.phone.substring(0, 3)}-${_ReservationFormState.phone.substring(3, 7)}-${_ReservationFormState.phone.substring(7)}',
+            initialValue: _ReservationFormState.phone.isEmpty
+                ? ''
+                : '${_ReservationFormState.phone.substring(0, 3)}-${_ReservationFormState.phone.substring(3, 7)}-${_ReservationFormState.phone.substring(7)}',
+            //initialValue: _ReservationFormState.phone,
             style: TextStyleSet.regular15,
             decoration: InputDecoration(
               helperText: '',
@@ -369,7 +453,7 @@ class PhoneDisplay extends StatelessWidget {
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               filled: true,
-              fillColor: ColorPalette.lightGrey.withOpacity(0.2),
+              fillColor: ColorPalette.grey.withOpacity(0.15),
               disabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 borderSide: BorderSide(
@@ -536,7 +620,9 @@ class TimeDisplay extends StatelessWidget {
 */
 
 class NumOfPeopleInput extends StatelessWidget {
-  const NumOfPeopleInput({super.key});
+  const NumOfPeopleInput({super.key, this.room});
+
+  final Room? room;
 
   @override
   Widget build(BuildContext context) {
@@ -563,7 +649,7 @@ class NumOfPeopleInput extends StatelessWidget {
               if (numOfPeople!.trim().isEmpty) {
                 return '이용 인원을 입력하세요';
               }
-              if (int.parse(numOfPeople) > 4) {
+              if (int.parse(numOfPeople) > room!.maxCapacity) {
                 return '최대 이용 인원을 초과했습니다';
               }
               return null;
@@ -686,7 +772,9 @@ class PurposeInput extends StatelessWidget {
 }
 
 class ReserveButton extends StatelessWidget {
-  const ReserveButton({super.key});
+  const ReserveButton({super.key, this.room});
+
+  final Room? room;
 
   @override
   Widget build(BuildContext context) {
@@ -704,6 +792,7 @@ class ReserveButton extends StatelessWidget {
         ),
         onPressed: () async {
           if (_ReservationFormState._formKey.currentState!.validate()) {
+            reserveField.setPlace(room!.place);
             await reservation
                 .reserveRoom(
               reserveField.place,
