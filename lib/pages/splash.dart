@@ -62,7 +62,7 @@ class _SplashPageState extends State<SplashPage> {
     return const Scaffold(
       appBar: null,
       body: Center(
-        child: Text('Today My School'),
+        child: Text('한국해양대학교 시설물 예약 시스템'),
       ),
     );
   }

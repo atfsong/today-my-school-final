@@ -258,7 +258,7 @@ class PasswordInput extends StatelessWidget {
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               filled: true,
-              fillColor: ColorPalette.lightGrey.withOpacity(0.2),
+              fillColor: ColorPalette.grey.withOpacity(0.15),
               disabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 borderSide: BorderSide(
@@ -304,7 +304,7 @@ class PasswordConfirmInput extends StatelessWidget {
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               filled: true,
-              fillColor: ColorPalette.lightGrey.withOpacity(0.2),
+              fillColor: ColorPalette.grey.withOpacity(0.15),
               disabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 borderSide: BorderSide(

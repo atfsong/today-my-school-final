@@ -56,17 +56,7 @@ class _RoomSelectPageState extends State<RoomSelectPage> {
                       location: rooms[index].location,
                       maxCapacity: rooms[index].maxCapacity,
                       image: rooms[index].image,
-                      isAvailable: const [
-                        true,
-                        true,
-                        false,
-                        false,
-                        true,
-                        true,
-                        true,
-                        false,
-                        true
-                      ],
+                      isAvailable: rooms[index].isAvailable,
                       index: index,
                     );
                   },
@@ -85,7 +75,7 @@ class ReservationStatusCard extends StatefulWidget {
   final String location;
   final int maxCapacity;
   final String image;
-  List<bool> isAvailable;
+  List isAvailable;
   final int index;
 
   ReservationStatusCard({
@@ -174,12 +164,12 @@ class _ReservationStatusCardState extends State<ReservationStatusCard> {
                 },
                 itemCount: widget.isAvailable.length,
                 itemBuilder: (context, index) {
-                  if (widget.isAvailable[index]) {
+                  if (widget.isAvailable[index]['isReserved']) {
                     return Container(
                       width: 28.w,
                       height: 4.h,
-                      decoration: const BoxDecoration(
-                        color: ColorPalette.green,
+                      decoration: BoxDecoration(
+                        color: ColorPalette.grey.withOpacity(0.7),
                       ),
                     );
                   }
@@ -187,7 +177,7 @@ class _ReservationStatusCardState extends State<ReservationStatusCard> {
                     width: 28.w,
                     height: 4.h,
                     decoration: const BoxDecoration(
-                      color: ColorPalette.lightGrey,
+                      color: ColorPalette.green,
                     ),
                   );
                 },

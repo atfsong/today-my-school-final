@@ -6,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:today_my_school_final/firebase_options.dart';
 import 'package:today_my_school_final/models/model_auth.dart';
 import 'package:today_my_school_final/models/model_reservation.dart';
-import 'package:today_my_school_final/models/model_user.dart';
 import 'package:today_my_school_final/pages/home.dart';
 import 'package:today_my_school_final/pages/login.dart';
 import 'package:today_my_school_final/pages/password_reset.dart';
@@ -36,7 +35,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthModel()),
-        ChangeNotifierProvider(create: (_) => UserModel()),
         ChangeNotifierProvider(create: (_) => ReservationModel()),
       ],
       child: ScreenUtilInit(
