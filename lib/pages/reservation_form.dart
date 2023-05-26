@@ -32,11 +32,13 @@ class _ReservationFormState extends State<ReservationForm> {
         .then(
       (snapshot) {
         if (snapshot.exists) {
-          setState(() {
-            name = snapshot.data()!['name'];
-            phone = snapshot.data()!['phone'];
-            snapshot.data()!['uid'];
-          });
+          if (mounted) {
+            setState(() {
+              name = snapshot.data()!['name'];
+              phone = snapshot.data()!['phone'];
+              snapshot.data()!['uid'];
+            });
+          }
         }
       },
     );
@@ -245,13 +247,14 @@ class _DatePickerState extends State<DatePicker> {
               this.selectedDay = selectedDay;
               this.focusedDay = selectedDay;
             });
-            reserveField.date = selectedDay;
+            reserveField.setDate(selectedDay);
           },
           selectedDayPredicate: (day) =>
               day.year == selectedDay.year &&
               day.month == selectedDay.month &&
               day.day == selectedDay.day,
           headerStyle: HeaderStyle(
+            titleCentered: true,
             formatButtonVisible: false,
             titleTextStyle: TextStyleSet.regular18,
             headerPadding: const EdgeInsets.only(top: 0),
@@ -309,7 +312,7 @@ class TimePicker extends StatefulWidget {
 }
 
 class _TimePickerState extends State<TimePicker> {
-  List selectedTime = [];
+  static List selectedTime = [];
 
   @override
   Widget build(BuildContext context) {
@@ -352,15 +355,20 @@ class _TimePickerState extends State<TimePicker> {
                       .contains(widget.room!.isAvailable[index]['time'])) {
                     selectedTime
                         .remove(widget.room!.isAvailable[index]['time']);
-                  } else {
+                    print(selectedTime);
+                  } else if (selectedTime.length < 2) {
                     selectedTime.add(widget.room!.isAvailable[index]['time']);
+                    print(selectedTime);
                   }
                 },
                 child: Container(
                   width: 100.w,
                   margin: EdgeInsets.symmetric(horizontal: 4.w),
                   decoration: BoxDecoration(
-                    color: ColorPalette.white,
+                    color: selectedTime
+                            .contains(widget.room!.isAvailable[index]['time'])
+                        ? ColorPalette.blue
+                        : ColorPalette.white,
                     border: Border.all(color: ColorPalette.blue),
                     borderRadius: BorderRadius.circular(5),
                   ),
@@ -465,7 +473,6 @@ class PhoneDisplay extends StatelessWidget {
             initialValue: _ReservationFormState.phone.isEmpty
                 ? ''
                 : '${_ReservationFormState.phone.substring(0, 3)}-${_ReservationFormState.phone.substring(3, 7)}-${_ReservationFormState.phone.substring(7)}',
-            //initialValue: _ReservationFormState.phone,
             style: TextStyleSet.regular15,
             decoration: InputDecoration(
               helperText: '',
@@ -812,8 +819,17 @@ class ReserveButton extends StatelessWidget {
           ),
         ),
         onPressed: () async {
-          if (_ReservationFormState._formKey.currentState!.validate()) {
+          if (_TimePickerState.selectedTime.isEmpty) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(content: Text('시간을 선택해주세요')),
+              );
+          } else if (_ReservationFormState._formKey.currentState!.validate()) {
             reserveField.setPlace(room!.place);
+            _TimePickerState.selectedTime.sort();
+            reserveField.setStartTime(_TimePickerState.selectedTime.first);
+            reserveField.setEndTime(_TimePickerState.selectedTime.last);
             await reservation
                 .reserveRoom(
               reserveField.place,
@@ -834,7 +850,6 @@ class ReserveButton extends StatelessWidget {
                     ..showSnackBar(
                       const SnackBar(content: Text('예약에 실패했어요 다시 시도해주세요')),
                     );
-                  Navigator.pop(context);
                 }
               },
             );

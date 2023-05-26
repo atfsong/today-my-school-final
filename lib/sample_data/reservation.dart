@@ -3,9 +3,9 @@ import 'package:today_my_school_final/models/model_reservation.dart';
 List<Reservation> reservations = [
   Reservation(
     place: '아치라운지 대회의실',
-    date: DateTime(2023, 5, 26),
-    startTime: DateTime(2023, 5, 26, 17),
-    endTime: DateTime(2023, 5, 26, 19),
+    date: DateTime(2023, 5, 31),
+    startTime: DateTime(2023, 5, 31, 17),
+    endTime: DateTime(2023, 5, 31, 19),
     numOfPeople: 6,
     purpose: '팀플',
     uid: 'fg6ovxzoyUZi3PBHiui3n5SiiDs1',

@@ -105,12 +105,14 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
         .then(
       (snapshot) async {
         if (snapshot.exists) {
-          setState(() {
-            email = snapshot.data()!['email'];
-            name = snapshot.data()!['name'];
-            phone = snapshot.data()!['phone'];
-            snapshot.data()!['uid'];
-          });
+          if (mounted) {
+            setState(() {
+              email = snapshot.data()!['email'];
+              name = snapshot.data()!['name'];
+              phone = snapshot.data()!['phone'];
+              snapshot.data()!['uid'];
+            });
+          }
         }
       },
     );
@@ -192,19 +194,9 @@ class NavigationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 320.w,
       height: 120.h,
-      decoration: const BoxDecoration(
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.25),
-            offset: Offset(0, 4),
-            blurRadius: 4,
-            spreadRadius: 0,
-          ),
-        ],
-      ),
       child: ElevatedButton(
         onPressed: () {
           if (route != null && uri == null) {
@@ -215,7 +207,9 @@ class NavigationButton extends StatelessWidget {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: ColorPalette.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          elevation: 8,
         ),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 8.w),

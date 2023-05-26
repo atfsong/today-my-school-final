@@ -29,11 +29,13 @@ class _ReservationResultPageState extends State<ReservationResultPage> {
         .then(
       (snapshot) async {
         if (snapshot.exists) {
-          setState(() {
-            _name = snapshot.data()!['name'];
-            _phone = snapshot.data()!['phone'];
-            snapshot.data()!['uid'];
-          });
+          if (mounted) {
+            setState(() {
+              _name = snapshot.data()!['name'];
+              _phone = snapshot.data()!['phone'];
+              snapshot.data()!['uid'];
+            });
+          }
         }
       },
     );

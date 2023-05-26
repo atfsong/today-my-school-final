@@ -28,12 +28,14 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
         .then(
       (snapshot) {
         if (snapshot.exists) {
-          setState(() {
-            email = snapshot.data()!['email'];
-            name = snapshot.data()!['name'];
-            phone = snapshot.data()!['phone'];
-            snapshot.data()!['uid'];
-          });
+          if (mounted) {
+            setState(() {
+              email = snapshot.data()!['email'];
+              name = snapshot.data()!['name'];
+              phone = snapshot.data()!['phone'];
+              snapshot.data()!['uid'];
+            });
+          }
         }
       },
     );
