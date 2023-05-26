@@ -2,6 +2,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+class Reservation {
+  final String place;
+  final DateTime date;
+  final DateTime startTime;
+  final DateTime endTime;
+  final int numOfPeople;
+  final String purpose;
+  final String uid;
+  final String rid;
+
+  Reservation({
+    required this.place,
+    required this.date,
+    required this.startTime,
+    required this.endTime,
+    required this.numOfPeople,
+    required this.purpose,
+    required this.uid,
+    required this.rid,
+  });
+}
+
 enum ReservationStatus {
   success,
   fail,

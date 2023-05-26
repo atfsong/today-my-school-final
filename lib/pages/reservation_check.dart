@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:today_my_school_final/data/reservation.dart';
+import 'package:today_my_school_final/sample_data/reservation.dart';
 import 'package:today_my_school_final/style.dart';
 
 class ReservationCheckPage extends StatefulWidget {
