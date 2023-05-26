@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:today_my_school_final/models/model_reservation.dart';
 import 'package:today_my_school_final/models/model_reserve.dart';
-import 'package:today_my_school_final/data/room.dart';
+import 'package:today_my_school_final/sample_data/room.dart';
 import 'package:today_my_school_final/style.dart';
 
 class ReservationForm extends StatefulWidget {
@@ -227,8 +227,19 @@ class _DatePickerState extends State<DatePicker> {
         TableCalendar(
           locale: 'ko_KR',
           focusedDay: focusedDay,
-          firstDay: DateTime(2023, 1, 1),
+          firstDay: DateTime.now(),
           lastDay: DateTime(2024, 12, 31),
+          enabledDayPredicate: (day) {
+            if (day.isBefore(DateTime(
+              DateTime.now().add(const Duration(days: 7)).year,
+              DateTime.now().add(const Duration(days: 7)).month,
+              DateTime.now().add(const Duration(days: 7)).day,
+            ))) {
+              return true;
+            } else {
+              return false;
+            }
+          },
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
               this.selectedDay = selectedDay;
@@ -298,6 +309,8 @@ class TimePicker extends StatefulWidget {
 }
 
 class _TimePickerState extends State<TimePicker> {
+  List selectedTime = [];
+
   @override
   Widget build(BuildContext context) {
     final reserveField = Provider.of<ReserveFieldModel>(context, listen: false);
@@ -334,7 +347,15 @@ class _TimePickerState extends State<TimePicker> {
                 );
               }
               return GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  if (selectedTime
+                      .contains(widget.room!.isAvailable[index]['time'])) {
+                    selectedTime
+                        .remove(widget.room!.isAvailable[index]['time']);
+                  } else {
+                    selectedTime.add(widget.room!.isAvailable[index]['time']);
+                  }
+                },
                 child: Container(
                   width: 100.w,
                   margin: EdgeInsets.symmetric(horizontal: 4.w),
