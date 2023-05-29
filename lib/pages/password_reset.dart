@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:today_my_school_final/models/model_auth.dart';
-import 'package:today_my_school_final/style.dart';
+import 'package:today_my_school/models/model_auth.dart';
+import 'package:today_my_school/style.dart';
 
 class PasswordResetPage extends StatefulWidget {
   const PasswordResetPage({super.key});

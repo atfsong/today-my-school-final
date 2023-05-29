@@ -1,11 +1,31 @@
-import 'package:today_my_school_final/models/model_reservation.dart';
+class Reservation {
+  final String place;
+  final DateTime date;
+  final DateTime startTime;
+  final DateTime endTime;
+  final int numOfPeople;
+  final String purpose;
+  final String uid;
+  final String rid;
+
+  Reservation({
+    required this.place,
+    required this.date,
+    required this.startTime,
+    required this.endTime,
+    required this.numOfPeople,
+    required this.purpose,
+    required this.uid,
+    required this.rid,
+  });
+}
 
 List<Reservation> reservations = [
   Reservation(
     place: '아치라운지 대회의실',
-    date: DateTime(2023, 5, 31),
-    startTime: DateTime(2023, 5, 31, 17),
-    endTime: DateTime(2023, 5, 31, 19),
+    date: DateTime(2023, 5, 26),
+    startTime: DateTime(2023, 5, 26, 17),
+    endTime: DateTime(2023, 5, 26, 19),
     numOfPeople: 6,
     purpose: '팀플',
     uid: 'fg6ovxzoyUZi3PBHiui3n5SiiDs1',

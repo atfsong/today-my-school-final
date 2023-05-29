@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:today_my_school_final/models/model_auth.dart';
-import 'package:today_my_school_final/models/model_editor.dart';
-import 'package:today_my_school_final/style.dart';
+import 'package:today_my_school/models/model_auth.dart';
+import 'package:today_my_school/models/model_editor.dart';
+import 'package:today_my_school/style.dart';
 import 'package:provider/provider.dart';
 
 class ProfileEditorPage extends StatefulWidget {
@@ -27,15 +27,13 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
         .get()
         .then(
       (snapshot) {
-        if (snapshot.exists) {
-          if (mounted) {
-            setState(() {
-              email = snapshot.data()!['email'];
-              name = snapshot.data()!['name'];
-              phone = snapshot.data()!['phone'];
-              snapshot.data()!['uid'];
-            });
-          }
+        if (mounted) {
+          setState(() {
+            email = snapshot.data()!['email'];
+            name = snapshot.data()!['name'];
+            phone = snapshot.data()!['phone'];
+            snapshot.data()!['uid'];
+          });
         }
       },
     );
@@ -51,6 +49,7 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
 
   @override
   void setState(VoidCallback fn) {
+    // TODO: implement setState
     super.setState(fn);
     _getUser();
   }
@@ -84,12 +83,12 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
           ],
         ),
         body: Builder(
-          builder: (BuildContext context) {
-            if (email.isNotEmpty) {
+          builder: (BuildContext context){
+            if(email.isNotEmpty){
               return SafeArea(
                 child: Center(
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: (){
                       FocusScope.of(context).unfocus();
                     },
                     child: CustomScrollView(
@@ -101,17 +100,15 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
                               Expanded(
                                 child: Padding(
                                   padding:
-                                      EdgeInsets.symmetric(horizontal: 24.w),
+                                    EdgeInsets.symmetric(horizontal: 24.w),
                                   child: Center(
-                                    child: Form(
-                                      key: _formKey,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                    child:Form(
+                                      key:_formKey,
+                                      child:Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               SizedBox(height: 8.h),
                                               const InputGuide(),
@@ -124,28 +121,25 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
                                             ],
                                           ),
                                           Padding(
-                                            padding: EdgeInsets.fromLTRB(
-                                                0, 16.h, 0, 40.h),
+                                            padding: EdgeInsets.fromLTRB(0,16.h,0,40.h),
                                             child: const EditButton(),
-                                          ),
+                                          )
                                         ],
-                                      ),
-                                    ),
+                                      )
+                                    )
                                   ),
-                                ),
-                              ),
+                                )
+                              )
                             ],
                           ),
                         ),
                       ],
-                    ),
+                    )
                   ),
                 ),
               );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+            }else{
+              return Center(child:CircularProgressIndicator());
             }
           },
         ),
@@ -277,7 +271,7 @@ class PasswordInput extends StatelessWidget {
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               filled: true,
-              fillColor: ColorPalette.grey.withOpacity(0.15),
+              fillColor: ColorPalette.lightGrey.withOpacity(0.2),
               disabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 borderSide: BorderSide(
@@ -323,7 +317,7 @@ class PasswordConfirmInput extends StatelessWidget {
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               filled: true,
-              fillColor: ColorPalette.grey.withOpacity(0.15),
+              fillColor: ColorPalette.lightGrey.withOpacity(0.2),
               disabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 borderSide: BorderSide(

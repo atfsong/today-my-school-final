@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:today_my_school_final/models/model_auth.dart';
+import 'package:today_my_school/models/model_auth.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -62,7 +62,7 @@ class _SplashPageState extends State<SplashPage> {
     return const Scaffold(
       appBar: null,
       body: Center(
-        child: Text('한국해양대학교 시설물 예약 시스템'),
+        child: Text('Today My School'),
       ),
     );
   }

@@ -97,8 +97,10 @@ class TextStyleSet {
 class ColorPalette {
   static const black = Color(0xFF373737);
   static const grey = Color(0xFF9B9B9B);
+  static const lightGrey = Color(0xFFCDCDCD);
   static const white = Color(0xFFFDFDFD);
   static const blue = Color(0xFF1D2F6C);
   static const red = Color(0xFFC10000);
   static const green = Color(0xFFA8FB3F);
+
 }

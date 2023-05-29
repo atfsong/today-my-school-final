@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:today_my_school/services/reservation_services.dart';
 
 class Reservation {
   final String place;
@@ -31,6 +33,7 @@ enum ReservationStatus {
 
 class ReservationModel with ChangeNotifier {
   final User? _user = FirebaseAuth.instance.currentUser;
+  final ReservationServices reservationServices=ReservationServices();
 
   Future<ReservationStatus> reserveRoom(
     String place,
@@ -38,7 +41,7 @@ class ReservationModel with ChangeNotifier {
     String startTime,
     String endTime,
     int numOfPeople,
-    String purpose,
+    String purpose
   ) async {
     CollectionReference reservations =
         FirebaseFirestore.instance.collection('reservations');
@@ -53,6 +56,11 @@ class ReservationModel with ChangeNotifier {
         'purpose': purpose,
         'uid': uid,
       });
+      // String sTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(startTime);
+      // String eTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(endTime);
+      // int roomId = idx;
+      // reservationServices.addReservation(roomId, uid, sTime, eTime, purpose, numOfPeople);
+
       return ReservationStatus.success;
     } catch (e) {
       print(e);

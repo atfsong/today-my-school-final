@@ -31,4 +31,21 @@ class SignupFieldModel extends ChangeNotifier {
     this.phone = phone;
     notifyListeners();
   }
+
+
+  String getName(){
+    return name;
+  }
+
+  String getEmail(){
+    return email;
+  }
+
+  String getPassword(){
+    return password;
+  }
+
+  String getPhone(){
+    return phone;
+  }
 }

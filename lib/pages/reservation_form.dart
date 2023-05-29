@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:today_my_school_final/models/model_reservation.dart';
-import 'package:today_my_school_final/models/model_reserve.dart';
-import 'package:today_my_school_final/sample_data/room.dart';
-import 'package:today_my_school_final/style.dart';
+import 'package:today_my_school/models/model_reservation.dart';
+import 'package:today_my_school/models/model_reserve.dart';
+import 'package:today_my_school/data/room.dart';
+import 'package:today_my_school/services/reservation_services.dart';
+import 'package:today_my_school/style.dart';
 
 class ReservationForm extends StatefulWidget {
   const ReservationForm({super.key, this.room});
@@ -32,7 +33,7 @@ class _ReservationFormState extends State<ReservationForm> {
         .then(
       (snapshot) {
         if (snapshot.exists) {
-          if (mounted) {
+          if(mounted){
             setState(() {
               name = snapshot.data()!['name'];
               phone = snapshot.data()!['phone'];
@@ -48,6 +49,17 @@ class _ReservationFormState extends State<ReservationForm> {
   @override
   void initState() {
     super.initState();
+    // 원본엔 없음
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _getUser();
+    // });
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    // TODO: implement setState
+    super.setState(fn);
+    _getUser();
   }
 
   @override
@@ -60,10 +72,15 @@ class _ReservationFormState extends State<ReservationForm> {
           foregroundColor: ColorPalette.blue,
           title: const Text('예약 정보 입력'),
         ),
+
         body: FutureBuilder(
           future: _getUser(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
+            // final reserveField = Provider.of<ReserveFieldModel>(context, listen: false);
+            // reserveField.place = widget.room!.place;
+            // reserveField.roomId = widget.room!.roomId;
+            //if(phone.isNotEmpty)
+            if(snapshot.hasData){
               return SafeArea(
                 bottom: false,
                 child: Center(
@@ -230,7 +247,7 @@ class _DatePickerState extends State<DatePicker> {
           locale: 'ko_KR',
           focusedDay: focusedDay,
           firstDay: DateTime.now(),
-          lastDay: DateTime(2024, 12, 31),
+          lastDay: DateTime.utc(2024, 12, 31),
           enabledDayPredicate: (day) {
             if (day.isBefore(DateTime(
               DateTime.now().add(const Duration(days: 7)).year,
@@ -273,7 +290,7 @@ class _DatePickerState extends State<DatePicker> {
           daysOfWeekStyle: DaysOfWeekStyle(
             weekdayStyle: TextStyleSet.light15,
             weekendStyle:
-                TextStyleSet.light15.copyWith(color: ColorPalette.grey),
+            TextStyleSet.light15.copyWith(color: ColorPalette.grey),
           ),
           calendarStyle: CalendarStyle(
             cellMargin: const EdgeInsets.all(0),
@@ -283,17 +300,17 @@ class _DatePickerState extends State<DatePicker> {
               shape: BoxShape.circle,
             ),
             selectedTextStyle:
-                TextStyleSet.medium18.copyWith(color: ColorPalette.white),
+            TextStyleSet.medium18.copyWith(color: ColorPalette.white),
             selectedDecoration: const BoxDecoration(
               color: ColorPalette.blue,
               shape: BoxShape.circle,
             ),
             outsideTextStyle:
-                TextStyleSet.light18.copyWith(color: ColorPalette.grey),
+            TextStyleSet.light18.copyWith(color: ColorPalette.grey),
             disabledTextStyle:
-                TextStyleSet.light18.copyWith(color: ColorPalette.grey),
+            TextStyleSet.light18.copyWith(color: ColorPalette.grey),
             weekendTextStyle:
-                TextStyleSet.light18.copyWith(color: ColorPalette.grey),
+            TextStyleSet.light18.copyWith(color: ColorPalette.grey),
             defaultTextStyle: TextStyleSet.regular18,
           ),
         )
@@ -303,7 +320,7 @@ class _DatePickerState extends State<DatePicker> {
 }
 
 class TimePicker extends StatefulWidget {
-  const TimePicker({super.key, this.room});
+  const TimePicker({super.key,this.room});
 
   final Room? room;
 
@@ -316,7 +333,8 @@ class _TimePickerState extends State<TimePicker> {
 
   @override
   Widget build(BuildContext context) {
-    final reserveField = Provider.of<ReserveFieldModel>(context, listen: false);
+    final reserveField = Provider.of<ReservationModel>(context, listen: false);
+
     return ExpansionTile(
       title: const Text('시간'),
       tilePadding: EdgeInsets.symmetric(horizontal: 24.h),
@@ -355,10 +373,10 @@ class _TimePickerState extends State<TimePicker> {
                       .contains(widget.room!.isAvailable[index]['time'])) {
                     selectedTime
                         .remove(widget.room!.isAvailable[index]['time']);
-                    print(selectedTime);
+                    //print(selectedTime);
                   } else if (selectedTime.length < 2) {
                     selectedTime.add(widget.room!.isAvailable[index]['time']);
-                    print(selectedTime);
+                    //print(selectedTime);
                   }
                 },
                 child: Container(
@@ -366,7 +384,7 @@ class _TimePickerState extends State<TimePicker> {
                   margin: EdgeInsets.symmetric(horizontal: 4.w),
                   decoration: BoxDecoration(
                     color: selectedTime
-                            .contains(widget.room!.isAvailable[index]['time'])
+                        .contains(widget.room!.isAvailable[index]['time'])
                         ? ColorPalette.blue
                         : ColorPalette.white,
                     border: Border.all(color: ColorPalette.blue),
@@ -375,11 +393,7 @@ class _TimePickerState extends State<TimePicker> {
                   child: Center(
                     child: Text(
                       widget.room!.isAvailable[index]['time'],
-                      style: selectedTime
-                              .contains(widget.room!.isAvailable[index]['time'])
-                          ? TextStyleSet.regular13
-                              .copyWith(color: ColorPalette.white)
-                          : TextStyleSet.regular13,
+                      style: TextStyleSet.regular13,
                     ),
                   ),
                 ),
@@ -437,7 +451,7 @@ class NameDisplay extends StatelessWidget {
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               filled: true,
-              fillColor: ColorPalette.grey.withOpacity(0.15),
+              fillColor: ColorPalette.lightGrey.withOpacity(0.15),
               disabledBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 borderSide: BorderSide(
@@ -652,7 +666,7 @@ class TimeDisplay extends StatelessWidget {
 */
 
 class NumOfPeopleInput extends StatelessWidget {
-  const NumOfPeopleInput({super.key, this.room});
+  const NumOfPeopleInput({super.key,this.room});
 
   final Room? room;
 
@@ -681,7 +695,7 @@ class NumOfPeopleInput extends StatelessWidget {
               if (numOfPeople!.trim().isEmpty) {
                 return '이용 인원을 입력하세요';
               }
-              if (int.parse(numOfPeople) > room!.maxCapacity) {
+              if (int.parse(numOfPeople) > 4) {
                 return '최대 이용 인원을 초과했습니다';
               }
               return null;
@@ -804,7 +818,7 @@ class PurposeInput extends StatelessWidget {
 }
 
 class ReserveButton extends StatelessWidget {
-  const ReserveButton({super.key, this.room});
+  const ReserveButton({super.key,this.room});
 
   final Room? room;
 
@@ -812,6 +826,7 @@ class ReserveButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final reservation = Provider.of<ReservationModel>(context, listen: false);
     final reserveField = Provider.of<ReserveFieldModel>(context, listen: false);
+    final ReservationServices reservationServices=ReservationServices();
     return SizedBox(
       width: 128.w,
       height: 40.h,
@@ -823,17 +838,28 @@ class ReserveButton extends StatelessWidget {
           ),
         ),
         onPressed: () async {
-          if (_TimePickerState.selectedTime.isEmpty) {
+          if(_TimePickerState.selectedTime.isEmpty){
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
                 const SnackBar(content: Text('시간을 선택해주세요')),
               );
-          } else if (_ReservationFormState._formKey.currentState!.validate()) {
+          }
+          else if (_ReservationFormState._formKey.currentState!.validate()) {
             reserveField.setPlace(room!.place);
             _TimePickerState.selectedTime.sort();
             reserveField.setStartTime(_TimePickerState.selectedTime.first);
             reserveField.setEndTime(_TimePickerState.selectedTime.last);
+            reserveField.setRoomId(room!.roomId);
+
+            await reservationServices.addReservation(
+                reserveField.roomId,
+                FirebaseAuth.instance.currentUser!.uid,
+                reserveField.startTime,
+                reserveField.endTime,
+                reserveField.purpose,
+                reserveField.numOfPeople);
+
             await reservation
                 .reserveRoom(
               reserveField.place,
@@ -844,8 +870,9 @@ class ReserveButton extends StatelessWidget {
               reserveField.purpose,
             )
                 .then(
-              (reservationStatus) {
-                if (reservationStatus == ReservationStatus.success) {
+                  (reservationStatus) {
+                if (reservationStatus == ReservationStatus.success){
+
                   Navigator.of(context)
                       .pushReplacementNamed('/reservation_result');
                 } else {

@@ -3,27 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:today_my_school_final/firebase_options.dart';
-import 'package:today_my_school_final/models/model_auth.dart';
-import 'package:today_my_school_final/models/model_reservation.dart';
-import 'package:today_my_school_final/pages/home.dart';
-import 'package:today_my_school_final/pages/login.dart';
-import 'package:today_my_school_final/pages/password_reset.dart';
-import 'package:today_my_school_final/pages/profile_editor.dart';
-import 'package:today_my_school_final/pages/reservation_check.dart';
-import 'package:today_my_school_final/pages/reservation_form.dart';
-import 'package:today_my_school_final/pages/reservation_result.dart';
-import 'package:today_my_school_final/pages/room_select.dart';
-import 'package:today_my_school_final/pages/signup.dart';
-import 'package:today_my_school_final/pages/splash.dart';
-import 'package:today_my_school_final/style.dart';
+import 'package:today_my_school/firebase_options.dart';
+import 'package:today_my_school/pages/home.dart';
+import 'package:today_my_school/pages/login.dart';
+import 'package:today_my_school/pages/password_reset.dart';
+import 'package:today_my_school/pages/profile_editor.dart';
+import 'package:today_my_school/pages/reservation_check.dart';
+import 'package:today_my_school/pages/reservation_form.dart';
+import 'package:today_my_school/pages/reservation_result.dart';
+import 'package:today_my_school/pages/room_select.dart';
+import 'package:today_my_school/pages/signup.dart';
+import 'package:today_my_school/pages/splash.dart';
+import 'package:today_my_school/style.dart';
+import 'package:today_my_school/models/model_auth.dart';
+import 'package:today_my_school/models/model_reservation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
+    name:"tody-my-school",
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await initializeDateFormatting();
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

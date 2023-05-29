@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:today_my_school_final/style.dart';
+import 'package:today_my_school/style.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
@@ -104,15 +104,13 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
         .get()
         .then(
       (snapshot) async {
-        if (snapshot.exists) {
-          if (mounted) {
-            setState(() {
-              email = snapshot.data()!['email'];
-              name = snapshot.data()!['name'];
-              phone = snapshot.data()!['phone'];
-              snapshot.data()!['uid'];
-            });
-          }
+        if (mounted) {
+          setState(() {
+            email = snapshot.data()!['email'];
+            name = snapshot.data()!['name'];
+            phone = snapshot.data()!['phone'];
+            snapshot.data()!['uid'];
+          });
         }
       },
     );
@@ -126,6 +124,7 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
 
   @override
   void setState(VoidCallback fn) {
+    // TODO: implement setState
     super.setState(fn);
     _getUser();
   }
@@ -207,8 +206,7 @@ class NavigationButton extends StatelessWidget {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: ColorPalette.white,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           elevation: 8,
         ),
         child: Padding(

@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:today_my_school_final/sample_data/reservation.dart';
-import 'package:today_my_school_final/style.dart';
+import 'package:today_my_school/data/reservation.dart';
+import 'package:today_my_school/style.dart';
 
 class ReservationResultPage extends StatefulWidget {
   const ReservationResultPage({super.key});
@@ -29,13 +29,11 @@ class _ReservationResultPageState extends State<ReservationResultPage> {
         .then(
       (snapshot) async {
         if (snapshot.exists) {
-          if (mounted) {
-            setState(() {
-              _name = snapshot.data()!['name'];
-              _phone = snapshot.data()!['phone'];
-              snapshot.data()!['uid'];
-            });
-          }
+          setState(() {
+            _name = snapshot.data()!['name'];
+            _phone = snapshot.data()!['phone'];
+            snapshot.data()!['uid'];
+          });
         }
       },
     );

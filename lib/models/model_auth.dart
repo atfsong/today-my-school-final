@@ -1,9 +1,11 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:today_my_school_final/models/model_editor.dart';
-import 'package:today_my_school_final/models/model_signup.dart';
+import 'package:today_my_school/models/model_editor.dart';
+import 'package:today_my_school/models/model_signup.dart';
+import 'package:today_my_school/services/database_services.dart';
 
 enum AuthStatus {
   signupSuccess,
@@ -20,6 +22,7 @@ enum AuthStatus {
 
 class AuthModel with ChangeNotifier {
   final FirebaseAuth _auth;
+  final DatabaseServices databaseServices=DatabaseServices();
   User? _user;
 
   AuthModel({auth}) : _auth = auth ?? FirebaseAuth.instance;
@@ -33,6 +36,15 @@ class AuthModel with ChangeNotifier {
       if (addUserStatus == AuthStatus.addFail) {
         return AuthStatus.signupFail;
       }
+
+      databaseServices.signUpUser(
+        signupField.getName(),
+        signupField.getEmail(),
+        signupField.getPassword(),
+        signupField.getPhone(),
+        credential.user!.uid
+      );
+
       return AuthStatus.signupSuccess;
     } catch (e) {
       print(e);
@@ -85,6 +97,7 @@ class AuthModel with ChangeNotifier {
         'phone': editorField.phone,
         'uid': uid,
       });
+      databaseServices.updateUser(uid,editorField.name, editorField.email, editorField.phone);
       return AuthStatus.updateSuccess;
     } catch (e) {
       print(e);

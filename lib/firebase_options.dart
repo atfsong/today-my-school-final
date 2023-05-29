@@ -50,20 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDTRgG_0wvYH4qCouhiRdR4qBW1P5fGIQA',
-    appId: '1:761182177972:android:75a03bf2617395b860a5e1',
-    messagingSenderId: '761182177972',
-    projectId: 'today-my-school-final',
-    storageBucket: 'today-my-school-final.appspot.com',
+    apiKey: 'AIzaSyAewSh2-iwIwOYbQSBH89Vh3w5KTrOpKos',
+    appId: '1:493466943059:android:9b51a5025ee47aa1c350a6',
+    messagingSenderId: '493466943059',
+    projectId: 'today-my-school-17fc7',
+    storageBucket: 'today-my-school.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBaVokS9uivMFEQNVqFjLUMcBloC26WcUo',
-    appId: '1:761182177972:ios:d1d917896b084d5c60a5e1',
-    messagingSenderId: '761182177972',
-    projectId: 'today-my-school-final',
-    storageBucket: 'today-my-school-final.appspot.com',
+    apiKey: 'AIzaSyAewSh2-iwIwOYbQSBH89Vh3w5KTrOpKos',
+    appId: '1:493466943059:android:9b51a5025ee47aa1c350a6',
+    messagingSenderId: '493466943059',
+    projectId: 'today-my-school-17fc7',
+    storageBucket: 'today-my-school.appspot.com',
     iosClientId: '761182177972-fitrbp6lmum8o18kuc030s80jk8vrrf1.apps.googleusercontent.com',
-    iosBundleId: 'com.example.todayMySchoolFinal',
+    iosBundleId: 'com.kmou.todayMySchoolFinal',
   );
 }

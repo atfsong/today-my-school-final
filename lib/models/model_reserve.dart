@@ -8,6 +8,12 @@ class ReserveFieldModel extends ChangeNotifier {
   String endTime = '';
   int numOfPeople = 0;
   String purpose = '';
+  int roomId=0;
+
+  void setRoomId(int roomId){
+    this.roomId = roomId;
+    notifyListeners();
+  }
 
   void setPlace(String place) {
     this.place = place;
