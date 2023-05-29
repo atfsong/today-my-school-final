@@ -375,7 +375,11 @@ class _TimePickerState extends State<TimePicker> {
                   child: Center(
                     child: Text(
                       widget.room!.isAvailable[index]['time'],
-                      style: TextStyleSet.regular13,
+                      style: selectedTime
+                              .contains(widget.room!.isAvailable[index]['time'])
+                          ? TextStyleSet.regular13
+                              .copyWith(color: ColorPalette.white)
+                          : TextStyleSet.regular13,
                     ),
                   ),
                 ),
