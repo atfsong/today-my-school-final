@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "761182177972",
+    "project_id": "today-my-school-final",
+    "storage_bucket": "today-my-school-final.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:761182177972:android:75a03bf2617395b860a5e1",
+        "android_client_info": {
+          "package_name": "com.example.today_my_school_final"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "761182177972-5enqre9ft1fk83tlidp212v5nsml336m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTRgG_0wvYH4qCouhiRdR4qBW1P5fGIQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "761182177972-5enqre9ft1fk83tlidp212v5nsml336m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
